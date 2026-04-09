@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz z regulaminu pracy zdalnej</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #18212f;
+      --muted: #5f6b7a;
+      --primary: #1d4ed8;
+      --primary-strong: #1e40af;
+      --border: #d7deea;
+      --success-bg: #e8f7ee;
+      --success-text: #17603a;
+      --danger-bg: #fdecec;
+      --danger-text: #8f1d1d;
+      --warning-bg: #fff7e6;
+      --warning-text: #8a5a00;
+      --shadow: 0 10px 30px rgba(16, 24, 40, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: linear-gradient(180deg, #eef3ff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 860px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 28px 28px 16px;
+      background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--primary);
+      background: #dbeafe;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .content {
+      padding: 28px;
+    }
+
+    .panel {
+      background: #fbfcff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: #e5eaf3;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--primary), #3b82f6);
+      transition: width 0.25s ease;
+    }
+
+    .question {
+      font-size: 24px;
+      line-height: 1.4;
+      margin: 0 0 24px;
+    }
+
+    .options {
+      display: grid;
+      gap: 14px;
+    }
+
+    .option {
+      width: 100%;
+      text-align: left;
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .option:hover {
+      border-color: #9db5ff;
+      transform: translateY(-1px);
+    }
+
+    .option.selected {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    button.primary, button.secondary {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    button.primary:hover { background: var(--primary-strong); }
+    button.primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: #eef2f7;
+      color: var(--text);
+    }
+
+    .screen-hidden { display: none; }
+
+    .result-score {
+      font-size: clamp(40px, 7vw, 64px);
+      font-weight: 800;
+      margin: 8px 0;
+    }
+
+    .result-box, .review-item {
+      border-radius: 16px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+    }
+
+    .result-box {
+      background: #f8fbff;
+      margin-top: 18px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .badge.good {
+      background: var(--success-bg);
+      color: var(--success-text);
+    }
+
+    .badge.medium {
+      background: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
+    .badge.low {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+    }
+
+    .review-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .review-item.correct {
+      background: #fbfffc;
+      border-color: #cbe8d4;
+    }
+
+    .review-item.wrong {
+      background: #fffafa;
+      border-color: #f1c8c8;
+    }
+
+    .review-item h3 {
+      margin: 0 0 12px;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+
+    .review-item p {
+      margin: 6px 0;
+      line-height: 1.5;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 0 28px 28px;
+    }
+
+    @media (max-width: 640px) {
+      .content, .header { padding: 20px; }
+      .panel { padding: 18px; }
+      .question { font-size: 20px; }
+      .actions { flex-direction: column; }
+      button.primary, button.secondary { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main class="app">
+      <section class="header">
+        <div class="eyebrow"> Quiz • Regulamin pracy zdalnej</div>
+        <h1>Sprawdź swoją wiedzę</h1>
+        <p class="subtitle"></p>
+      </section>
+
+      <section class="content">
+        <div id="quiz-screen" class="panel">
+          <div class="meta">
+            <div id="counter"></div>
+            <div id="answered"></div>
+          </div>
+          <div class="progress-track">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+          <h2 id="question-text" class="question"></h2>
+          <div id="options" class="options"></div>
+          <div class="actions">
+            <button class="primary" id="next-btn" disabled>Dalej</button>
+          </div>
+        </div>
+
+        <div id="result-screen" class="panel screen-hidden">
+          <span id="result-badge" class="badge">Wynik</span>
+          <h2>Twój wynik końcowy</h2>
+          <div id="result-score" class="result-score"></div>
+          <p id="result-summary"></p>
+          <div class="result-box">
+            <strong>Podsumowanie</strong>
+            <p>Poniżej znajdziesz przegląd odpowiedzi z tego podejścia.</p>
+          </div>
+          <div class="actions">
+            <button class="secondary" id="restart-btn">Rozwiąż jeszcze raz</button>
+          </div>
+          <div id="review-list" class="review-list"></div>
+        </div>
+      </section>
+
+      <div class="footer">fuck yeah
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const allQuestions = [
+      { question: "Ile dni pracy zdalnej tygodniowo może wykonywać pracownik zatrudniony w pełnym wymiarze czasu pracy?", options: ["Do 2 dni w każdym tygodniu roboczym", "Do 2 dni w danym tygodniu", "Maksymalnie 3 dni, jeśli jeden dzień jest stacjonarny", "Do 2 dni, ale tylko po wcześniejszym zatwierdzeniu każdego tygodnia przez kadry"], answer: 1 },
+      { question: "Jak ustala się wymiar pracy zdalnej dla pracowników zatrudnionych w niepełnym wymiarze czasu pracy?", options: ["W jednakowym wymiarze dla wszystkich, niezależnie od etatu", "Na podstawie uznania kierownika komórki organizacyjnej", "Proporcjonalnie do wymiaru czasu pracy", "Na podstawie miesięcznej liczby godzin zaplanowanych w grafiku"], answer: 2 },
+      { question: "Ile dni stacjonarnych w tygodniu musi wyznaczyć kierownik komórki organizacyjnej?", options: ["Co najmniej jeden dzień", "Dokładnie jeden dzień", "Minimum dwa dni", "Tyle dni, ile wynika z potrzeb zespołu w danym miesiącu"], answer: 1 },
+      { question: "Kto wyznacza obowiązkowy dzień pracy stacjonarnej?", options: ["Dyrektor Generalny w porozumieniu z kadrami", "Pracownik po uzgodnieniu z zespołem", "Kierownik komórki organizacyjnej", "Bezpośredni przełożony wyłącznie na podstawie miesięcznego harmonogramu"], answer: 2 },
+      { question: "Czy pracodawca może zobowiązać pracownika do pracy stacjonarnej także w innym dniu niż wyznaczony?", options: ["Tak, ale wyłącznie po uprzednim wpisaniu tego do harmonogramu miesięcznego", "Tak, jeśli pracodawca lub kierownik uzna to za niezbędne", "Nie, poza sytuacjami awarii sprzętu po stronie pracownika", "Tak, ale tylko raz w tygodniu"], answer: 1 },
+      { question: "Która z poniższych sytuacji została wskazana jako przykład obowiązkowej obecności w miejscu pracy?", options: ["Odbiór sprzętu komputerowego po serwisie", "Podpis dokumentów, w tym z zakresu kadr i finansów", "Konsultacja telefoniczna z innym działem", "Przygotowanie tygodniowego planu pracy"], answer: 1 },
+      { question: "Która z poniższych sytuacji także uzasadnia obowiązek pracy stacjonarnej?", options: ["Spotkania i szkolenia stacjonarne", "Przygotowanie prezentacji dla zespołu", "Wewnętrzne ustalenia prowadzone mailowo", "Praca nad zadaniem wymagającym koncentracji"], answer: 0 },
+      { question: "Co przewiduje nowa regulacja w zakresie pracy zdalnej powyżej tygodniowego limitu?", options: ["Jest dopuszczalna za zgodą kierownika, bez dalszych warunków", "Co do zasady się jej nie przewiduje, chyba że zachodzą szczególne okoliczności", "Może być stosowana zamiennie z pracą zdalną okazjonalną", "Przysługuje automatycznie osobom o wysokiej samodzielności"], answer: 1 },
+      { question: "Kto rozpatruje wnioski o wykonywanie pracy zdalnej w większym wymiarze?", options: ["Bezpośredni przełożony po opinii kierownika", "Dyrektor Generalny", "Kierownik komórki organizacyjnej wspólnie z działem kadr", "Pracodawca reprezentowany przez dział administracyjny"], answer: 1 },
+      { question: "Czy w tym samym dniu można łączyć pracę zdalną z pracą stacjonarną?", options: ["Tak, jeśli łączny czas pracy nie przekracza 8 godzin", "Nie, z wyjątkiem określonych sytuacji", "Tak, pod warunkiem wcześniejszego zgłoszenia mailowego", "Nie, chyba że pracownik odpracowuje wyjście prywatne"], answer: 1 },
+      { question: "Która z poniższych okoliczności pozwala wyjątkowo połączyć pracę zdalną i stacjonarną w tym samym dniu?", options: ["Nieplanowana potrzeba pracodawcy", "Konieczność osobistego załatwienia sprawy służbowej przez pracownika", "Nagła zmiana ustalonego grafiku zespołu", "Wystąpienie pilnego spotkania online"], answer: 0 },
+      { question: "Jaka druga okoliczność pozwala na zmianę trybu pracy w tym samym dniu?", options: ["Awaria sprzętu lub inna przyczyna uniemożliwiająca pracę zdalną, której nie da się usunąć niezwłocznie", "Przejściowe problemy z łączem internetowym niezależnie od czasu ich usunięcia", "Brak dostępu do jednego z systemów służbowych", "Opóźnienie w dostarczeniu dokumentów elektronicznych"], answer: 0 },
+      { question: "Co powinien zrobić pracownik w razie awarii sprzętu uniemożliwiającej pracę zdalną?", options: ["Skontaktować się wyłącznie z działem IT i oczekiwać na instrukcje", "Niezwłocznie powiadomić kierownika komórki organizacyjnej", "Zgłosić problem do kadr przed końcem dnia pracy", "Samodzielnie zdecydować o odpracowaniu czasu w innym terminie"], answer: 1 },
+      { question: "Kto ma prawo kontrolować wykonywanie pracy zdalnej?", options: ["Wyłącznie kierownik komórki organizacyjnej", "Kierownicy komórek organizacyjnych lub bezpośredni przełożeni", "Każda osoba upoważniona przez dział kadr", "Wyłącznie pracodawca działający osobiście"], answer: 1 },
+      { question: "Czego może żądać pracodawca w ramach kontroli pracy zdalnej?", options: ["Okresowego raportu obecności wraz ze screenami z komunikatora", "Informacji o wynikach pracy", "Szczegółowego opisu sposobu organizacji stanowiska pracy każdego dnia", "Potwierdzenia aktywności w godzinach pracy w formie telefonicznej"], answer: 1 },
+      { question: "Co nowego może wprowadzić kierownik wobec pracowników wykonujących pracę zdalną?", options: ["Obowiązek codziennego raportowania godzin rozpoczęcia i zakończenia pracy", "Obowiązek sporządzania wykazu zadań wykonywanych podczas pracy zdalnej", "Wymóg stałej dostępności na wideopołączeniu", "Dodatkowe potwierdzanie wykonania każdego zadania w systemie kadrowym"], answer: 1 },
+      { question: "W jaki sposób przekazuje się wykaz zadań wykonywanych podczas pracy zdalnej?", options: ["Za pomocą służbowej poczty elektronicznej", "Przez system EZD albo pocztą elektroniczną, zależnie od decyzji kierownika", "W formie notatki służbowej przekazywanej po zakończeniu tygodnia", "Za pośrednictwem komunikatora używanego w urzędzie"], answer: 0 },
+      { question: "Komu może być przekazany wykaz zadań?", options: ["Wyłącznie kierownikowi komórki organizacyjnej", "Kierownikowi komórki organizacyjnej lub bezpośredniemu przełożonemu", "Kierownikowi, a w razie jego nieobecności do działu kadr", "Dowolnej osobie wskazanej w harmonogramie zastępstw"], answer: 1 },
+      { question: "Do czego pracownik jest zobowiązany podczas pracy zdalnej w zakresie czasu pracy?", options: ["Do ewidencjonowania wszystkich zdarzeń dotyczących swojego czasu pracy", "Do odnotowywania wyłącznie odstępstw od standardowych godzin pracy", "Do prowadzenia uproszczonej ewidencji obecności i nieobecności", "Do raportowania wszystkich zmian w czasie pracy wyłącznie przełożonemu"], answer: 0 },
+      { question: "Jaką formę może mieć odpracowanie wyjścia prywatnego przypadającego podczas pracy zdalnej?", options: ["Co do zasady zdalną, chyba że przełożony zdecyduje inaczej", "Dowolną", "Wyłącznie zgodną z pierwotną formą świadczenia pracy w danym dniu", "Stacjonarną albo zdalną, ale tylko po uzyskaniu akceptacji kadr"], answer: 1 },
+      { question: "Jak należy odpracować wyjście prywatne udzielone w dniu pracy stacjonarnej?", options: ["W formie uzgodnionej z przełożonym, zależnie od potrzeb komórki", "Wyłącznie w formie pracy stacjonarnej", "W pierwszej kolejności stacjonarnie, a wyjątkowo zdalnie", "W tej samej formie, w jakiej w danym tygodniu przeważała praca"], answer: 1 },
+      { question: "Na jakich dokumentach pracują pracownicy w trakcie pracy zdalnej?", options: ["Na dokumentach elektronicznych, a papierowych tylko za zgodą bezpośredniego przełożonego", "Wyłącznie na dokumentach w formie elektronicznej", "Na dokumentach elektronicznych i papierowych, jeśli nie zawierają danych wrażliwych", "Co do zasady elektronicznych, chyba że zadanie wymaga posługiwania się aktami papierowymi"], answer: 1 },
+      { question: "Czy można wynosić dokumenty poza siedzibę urzędu podczas pracy zdalnej?", options: ["Tak, jeśli pracownik zapewni odpowiednie warunki ich przechowywania", "Nie, chyba że w szczególnie uzasadnionych przypadkach za uprzednią zgodą kierownika", "Tak, jeśli dokumenty są potrzebne do realizacji zadań w danym dniu", "Nie, z wyjątkiem dokumentów roboczych niewymagających rejestracji"], answer: 1 },
+      { question: "Co powinien zapewnić sobie pracownik wykonujący pracę zdalną?", options: ["Dostęp do akt, dokumentów oraz innych materiałów niezbędnych do pracy", "Przede wszystkim dostęp do komputera i służbowej skrzynki pocztowej", "Możliwość realizacji zadań bez konieczności korzystania z akt papierowych", "Stanowisko pracy umożliwiające nieprzerwany kontakt z przełożonym"], answer: 0 },
+      { question: "Co może skutkować odpowiedzialnością pracownika i utratą możliwości pracy zdalnej?", options: ["Każde naruszenie zasad organizacji pracy zdalnej, niezależnie od wagi", "Nienależyte wykonywanie obowiązków służbowych podczas pracy zdalnej", "Brak odpowiedzi na pojedynczą wiadomość poza godzinami pracy", "Nieterminowe przesłanie jednorazowego wykazu zadań"], answer: 1 },
+      { question: "Jaki sposób komunikacji został wskazany jako obowiązkowy do bieżącego kontaktu podczas pracy zdalnej?", options: ["Służbowa poczta elektroniczna oraz komunikator wykorzystywany u pracodawcy", "Służbowa poczta elektroniczna oraz telefon służbowy", "Komunikator wykorzystywany u pracodawcy, a w sprawach pilnych telefon", "Dowolny kanał uzgodniony z zespołem, pod warunkiem bieżącej dostępności"], answer: 0 },
+      { question: "O której godzinie standardowo rozpoczyna się praca zdalna według dodatkowych regulacji?", options: ["O 8:00, chyba że kierownik wyznaczy inną godzinę", "O 8:15", "Między 8:00 a 8:30, zależnie od potrzeb komórki", "Nie później niż o 8:15"], answer: 1 },
+      { question: "Która grupa pracowników może rozpoczynać dzień pracy w godzinach 7:00–9:30?", options: ["Pracownicy terenowi wskazani każdorazowo przez kierownika", "Pracownicy świadczący pracę w siedzibach wojewódzkich inspektoratów nadzoru budowlanego oraz na terenie województwa", "Wszyscy pracownicy wykonujący obowiązki poza centralą urzędu", "Pracownicy realizujący zadania poza siedzibą urzędu przez większość tygodnia"], answer: 1 },
+      { question: "Do czego godziny 7:00–9:30 mają być dostosowane w przypadku pracowników terenowych lub IT zamiejscowych?", options: ["Do godzin pracy jednostek, z którymi współpracują w terenie", "Do potrzeb realizowanych działań w terenie", "Do ustalonego harmonogramu czynności kontrolnych i inspekcyjnych", "Do czasu dojazdu oraz planowanych czynności służbowych"], answer: 1 },
+      { question: "Jaki jest główny cel nowych rozwiązań opisanych w regulaminie?", options: ["Ujednolicenie zasad organizacji pracy niezależnie od formy jej świadczenia", "Doprecyzowanie zasad pracy zdalnej, obecności stacjonarnej, kontroli i organizacji pracy", "Ograniczenie liczby przypadków stosowania pracy zdalnej okazjonalnej", "Wzmocnienie uprawnień kierowników w zakresie planowania harmonogramów pracy"], answer: 1 }
+    ];
+
+    const QUESTIONS_PER_QUIZ = 10;
+
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const counter = document.getElementById('counter');
+    const answered = document.getElementById('answered');
+    const progressBar = document.getElementById('progress-bar');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options');
+    const resultScore = document.getElementById('result-score');
+    const resultSummary = document.getElementById('result-summary');
+    const resultBadge = document.getElementById('result-badge');
+    const reviewList = document.getElementById('review-list');
+
+    let currentQuestion = 0;
+    let questions = [];
+    let selectedAnswers = [];
+
+    function shuffleArray(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function startQuiz() {
+      questions = shuffleArray(allQuestions).slice(0, QUESTIONS_PER_QUIZ);
+      selectedAnswers = new Array(QUESTIONS_PER_QUIZ).fill(null);
+      currentQuestion = 0;
+      resultScreen.classList.add('screen-hidden');
+      quizScreen.classList.remove('screen-hidden');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+      counter.textContent = `Pytanie ${currentQuestion + 1} z ${QUESTIONS_PER_QUIZ}`;
+      const answeredCount = selectedAnswers.filter(answer => answer !== null).length;
+      answered.textContent = `Udzielono odpowiedzi: ${answeredCount}/${QUESTIONS_PER_QUIZ}`;
+      progressBar.style.width = `${((currentQuestion + 1) / QUESTIONS_PER_QUIZ) * 100}%`;
+      questionText.textContent = q.question;
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.className = 'option';
+        button.type = 'button';
+        button.textContent = option;
+
+        if (selectedAnswers[currentQuestion] === index) {
+          button.classList.add('selected');
+        }
+
+        button.addEventListener('click', () => {
+          selectedAnswers[currentQuestion] = index;
+          renderQuestion();
+        });
+
+        optionsContainer.appendChild(button);
+      });
+
+      nextBtn.disabled = selectedAnswers[currentQuestion] === null;
+      nextBtn.textContent = currentQuestion === QUESTIONS_PER_QUIZ - 1 ? 'Zakończ quiz' : 'Dalej';
+    }
+
+    function showResults() {
+      quizScreen.classList.add('screen-hidden');
+      resultScreen.classList.remove('screen-hidden');
+
+      let score = 0;
+      questions.forEach((q, index) => {
+        if (selectedAnswers[index] === q.answer) score++;
+      });
+
+      const percentage = Math.round((score / QUESTIONS_PER_QUIZ) * 100);
+      resultScore.textContent = `${score}/${QUESTIONS_PER_QUIZ}`;
+      resultSummary.textContent = `Uzyskałeś ${percentage}% poprawnych odpowiedzi.`;
+
+      if (score < QUESTIONS_PER_QUIZ) {
+        const img = document.createElement("img");
+        img.src = "./image/widelec.png"; // ← tu podaj nazwę pliku ze zdjęciem
+        img.style.marginTop = "20px";
+        img.style.maxWidth = "100%";
+        img.style.borderRadius = "12px";
+
+        document.getElementById("result-screen").appendChild(img);
+        }
+
+      resultBadge.className = 'badge';
+      if (percentage >= 80) {
+        resultBadge.classList.add('good');
+        resultBadge.textContent = 'Bardzo dobry wynik';
+      } else if (percentage >= 50) {
+        resultBadge.classList.add('medium');
+        resultBadge.textContent = 'Dobry początek';
+      } else {
+        resultBadge.classList.add('low');
+        resultBadge.textContent = 'Warto powtórzyć regulamin';
+      }
+
+      reviewList.innerHTML = '';
+      questions.forEach((q, index) => {
+        const item = document.createElement('div');
+        const isCorrect = selectedAnswers[index] === q.answer;
+        item.className = `review-item ${isCorrect ? 'correct' : 'wrong'}`;
+        item.innerHTML = `
+          <h3>${index + 1}. ${q.question}</h3>
+          <p><strong>Twoja odpowiedź:</strong> ${selectedAnswers[index] !== null ? q.options[selectedAnswers[index]] : 'Brak odpowiedzi'}</p>
+          <p><strong>Poprawna odpowiedź:</strong> ${q.options[q.answer]}</p>
+          <p><strong>Status:</strong> ${isCorrect ? '✅ Poprawnie' : '❌ Niepoprawnie'}</p>
+        `;
+        reviewList.appendChild(item);
+      });
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (selectedAnswers[currentQuestion] === null) {
+        return;
+      }
+
+      if (currentQuestion === QUESTIONS_PER_QUIZ - 1) {
+        showResults();
+      } else {
+        currentQuestion += 1;
+        renderQuestion();
+      }
+    });
+
+    restartBtn.addEventListener('click', startQuiz);
+
+    startQuiz();
+  </script>
+</body>
+</html>
